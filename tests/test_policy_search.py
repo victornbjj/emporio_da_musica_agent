@@ -1,6 +1,6 @@
 import pytest
 
-from src.emporio_agent.retrivel.policy_search import  PolicySearch, tokenize
+from emporio_agent.retrieval.policy_search import PolicySearch, tokenize
 
 
 @pytest.fixture(scope="module")
