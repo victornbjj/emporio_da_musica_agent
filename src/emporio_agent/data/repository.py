@@ -8,7 +8,7 @@ import unicodedata
 from decimal import Decimal, InvalidOperation
 from functools import lru_cache
 
-from ..retrivel.policy_search import  STOPWORDS
+from ..retrieval.policy_search import  STOPWORDS
 from ..rules.pricing import (
     active_promotion_percent, allowed_installments, format_brl, quote_price,
 )

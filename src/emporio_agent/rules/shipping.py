@@ -32,7 +32,7 @@ def needs_special_freight(product_name: str, category_name: str = "") -> bool:
     return any(k in text for k in LARGE_ITEMS_KEYWORDS)
 
 
-def shipping_for(city: str, order_total, larger_item: bool) -> ShippingInfo:
+def shipping_for(city: str, order_total, larger_item: bool = False) -> ShippingInfo:
     total = Decimal(str(order_total))
     notes = []
     if larger_item:

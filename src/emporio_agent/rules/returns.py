@@ -4,10 +4,8 @@
 from dataclasses import dataclass, field
 from datetime import date
 
-from sqlalchemy import false
-
 REGRET_DAYS  = 7
-DEFFECT_EXCHANGE_DAYS = 30
+DEFECT_EXCHANGE_DAYS = 30
 LEGAL_WARRANTY_DAYS = 90
 
 
@@ -19,7 +17,7 @@ class ReturnCheck:
     days_since_purchase: int
     day_since_delivery: int | None
     regret_eligible: bool = False
-    deffect_exchange_eligible: bool = False
+    defect_exchange_eligible: bool = False
     legal_warranty_eligible: bool = False
     notes : list[str] = field(default_factory=list)
 
@@ -34,7 +32,7 @@ def check_return_eligibility(
     today: date,
 ) -> ReturnCheck:
     since_purchase = (today - order_date).days
-    delivered = status == "deliverd" and delivery_date is not None
+    delivered = status == "delivered" and delivery_date is not None
     since_delivery = (today - delivery_date).days if delivered  else None
     check = ReturnCheck(order_id, status, delivered, since_purchase, since_delivery)
 
@@ -50,9 +48,9 @@ def check_return_eligibility(
         return check
 
     check.regret_eligible = since_delivery <= REGRET_DAYS
-    check.deffect_exchange_eligible = since_purchase <= DEFFECT_EXCHANGE_DAYS
+    check.defect_exchange_eligible = since_purchase <= DEFECT_EXCHANGE_DAYS
     check.legal_warranty_eligible = since_delivery < LEGAL_WARRANTY_DAYS
-    if not check.deffect_exchange_eligible and check.legal_warranty_eligible:
+    if not check.defect_exchange_eligible and check.legal_warranty_eligible:
         check.notes.append(
             "Store exchange window (30 days) is over, but te 90-day legal warranty still"
             "appilies; the manufacturer warranty can be triggered, and the store can help"
