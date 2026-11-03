@@ -9,7 +9,7 @@ def _search() -> PolicySearch:
     return PolicySearch()
 
 
-def search_policies(query: str, top_k: int = 2) -> dict:
+def search_policies(query: str, top_k: int = 3) -> dict:
     hits = _search().search(query, top_k=max(1, min(int(top_k), 3)))
     if not hits:
         return {"found": False,

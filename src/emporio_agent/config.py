@@ -25,7 +25,7 @@ def get_settings() -> Settings:
     return Settings(
         api_key=api_key,
         base_url=os.getenv("LLM_BASE_URL", "https://api.groq.com/openai/v1"),
-        model=os.getenv("LLM_MODEL_NAME", "openai/gpt-oss-120b"),
+        model=os.getenv("LLM_MODEL", "openai/gpt-oss-120b"),
         as_of_date=get_as_of_date(),
     )
 

@@ -30,12 +30,12 @@ TOOL_SCHEMAS = [
     _tool("search_products",
           "Busca produtos no catálogo com filtros. Use SEMPRE antes de citar preço, estoque ou promoção. "
           "Preços filtrados são o que o cliente paga.",
-          {"category": {"type": "string", "description": "Ex.: violão, guitarra, ukulele, bateria"},
-           "query": {"type": "string", "description": "Palavras-chave (marca, modelo, características)"},
+          {"category": {"type": "string", "description": "Tipo de instrumento: violão, guitarra, ukulele, baixo, bateria, teclado. Use SEMPRE que o cliente citar o tipo de instrumento."},
+           "query": {"type": "string", "description": "Só detalhes extras: marca, modelo, nylon, aço, iniciante. NUNCA coloque aqui o tipo de instrumento."},
            "min_price": {"type": "number"}, "max_price": {"type": "number"},
            "only_available": {"type": "boolean"},
            "sort": {"type": "string", "enum": ["price_asc", "price_desc"]},
-           "limit": {"type": "integer"}}),
+           "limit": {"type": "integer", "description": "Máximo de resultados (até 8)"}}),
     _tool("get_product_details",
           "Detalhes de UM produto pelo nome (preço, promoção, PIX, parcelas, specs). "
           "Se indisponível, traz alternativas.",
@@ -55,7 +55,7 @@ TOOL_SCHEMAS = [
           "Parcelamento permitido e se pode combinar formas de pagamento para um valor.",
           {"amount": {"type": "number"}}, ["amount"]),
     _tool("search_policies",
-          "Consulta o manual da loja: horário, trocas, garantia, rastreamento, formas de pagamento, LGPD.",
+          "Consulta o manual da loja: horário, trocas, devoluções, garantia, rastreamento, pagamento, LGPD. Escreva a consulta com várias palavras-chave, não uma só.",
           {"query": {"type": "string"}}, ["query"]),
 ]
 

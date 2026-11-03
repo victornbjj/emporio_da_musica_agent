@@ -54,3 +54,13 @@ def test_shipping_question_retrieves_both_shipping_rules(ps):
 def test_installment_question_matches_payment_rules(ps):
     hits = {h.section for h in ps.search("posso pagar em 10x?", top_k=2)}
     assert hits & {"3", "3.1"}
+
+
+def test_comprehensive_return_question_returns_both_modalities():
+    sections = {
+        hit.section
+        for hit in PolicySearch().search(
+            "troca devolução arrependimento defeito garantia prazo", top_k=3
+        )
+    }
+    assert {"4.1", "4.2"} <= sections
