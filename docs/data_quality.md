@@ -28,6 +28,8 @@ The list is produced by `python -m emporio_agent.data.loader` (function `audit()
 | A2 | `estimated_delivery` is used as the delivery date for delivered orders | There is no `delivered_at` column |
 | A3 | The shipping region is taken from `customers.city` | There is no delivery address in the data |
 | A4 | `total_brl` is the amount the customer paid | Prices may have changed after the purchase |
+| A5 | All orders are treated as **online** orders | There is no sales channel column, and the orders have tracking codes and shipping |
+| A6 | "Metropolitan area" = only the city of Campo Grande | The manual does not define it |
 
 ## 2. Problems in the data
 
@@ -43,7 +45,7 @@ The list is produced by `python -m emporio_agent.data.loader` (function `audit()
 | D8 | Two customers share one email | Customers 11 and 43 | Never finds a customer by email alone. Order lookup needs the **order number plus** email or phone |
 | D9 | Order total is different from the sum of item prices | Order 3 (−48.00), order 20 (−88.00) | Uses `total_brl` as the paid value. Does not recalculate old orders |
 | D10 | No `delivered_at` column | 7 delivered orders | See assumption A2 |
-
+| D11 | 12 of 20 orders have no estimated delivery date | Orders 9 to 20 (confirmed, pending, cancelled) | Shows no delivery date and never invents one. The order is not marked as late |
 ## 3. Problems in the policy manual
 
 | # | Problem | What the agent does |
@@ -89,7 +91,8 @@ A lista é gerada por `python -m emporio_agent.data.loader` (função `audit()`)
 | A2 | `estimated_delivery` é usada como data de entrega dos pedidos entregues | Não existe a coluna `delivered_at` |
 | A3 | A região de frete vem de `customers.city` | Não há endereço de entrega nos dados |
 | A4 | `total_brl` é o valor que o cliente pagou | Os preços podem ter mudado depois da compra |
-
+| A5 | Todos os pedidos são tratados como **online** | Não há coluna de canal de venda, e os pedidos têm código de rastreio e frete |
+| A6 | "Região metropolitana" = somente a cidade de Campo Grande | O manual não define o termo |
 ## 2. Problemas nos dados
 
 | # | Problema | Exemplo | O que o agente faz |
@@ -104,7 +107,7 @@ A lista é gerada por `python -m emporio_agent.data.loader` (função `audit()`)
 | D8 | Dois clientes com o mesmo e-mail | Clientes 11 e 43 | Nunca identifica o cliente só pelo e-mail. A consulta de pedido exige **número do pedido mais** e-mail ou telefone |
 | D9 | Total do pedido diferente da soma dos itens | Pedido 3 (−48,00), pedido 20 (−88,00) | Usa `total_brl` como valor pago. Não recalcula pedidos antigos |
 | D10 | Sem coluna `delivered_at` | 7 pedidos entregues | Ver suposição A2 |
-
+| D11 | 12 dos 20 pedidos não têm previsão de entrega | Pedidos 9 a 20 (confirmados, pendentes, cancelados) | Não mostra data de entrega e nunca inventa uma. O pedido não é marcado como atrasado 
 ## 3. Problemas no manual de políticas
 
 | # | Problema | O que o agente faz |

@@ -171,6 +171,22 @@ AI assistants were used during development:
 - All generated code was read, run and tested before being committed. Decisions listed in this
   document were reviewed and chosen by the author.
 
+## Issues found by running the code
+
+Problems caught by tests and manual runs, and fixed:
+
+- **Category search matched the wrong category:** "violão" resolved to "Cordas Orquestrais"
+  because singular and plural forms produced different word stems. Fixed the stemming.
+- **12 of 20 orders crashed the order tool:** orders without an estimated delivery date raised
+  an error. Fixed, with regression tests.
+- **Exchange deadlines were incomplete:** a short policy query returned only one of the four
+  deadline sections. The prompt now asks for queries covering all modalities and the search
+  returns three sections instead of two.
+- **Invisible characters in model output:** the model sometimes used non-breaking hyphens and
+  narrow spaces. Replies are now normalized.
+- **Tool errors were mislabeled:** an internal error inside a tool was reported as "invalid
+  arguments". Argument validation is now separate from execution errors.
+
 ## Project structure
 
 ```
