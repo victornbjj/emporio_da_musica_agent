@@ -1,6 +1,5 @@
 """Order tools. Every order lookup requires identity verification."""
 
-import os
 import re
 from dataclasses import asdict
 from datetime import date
@@ -8,6 +7,7 @@ from functools import lru_cache
 
 import pandas as pd
 
+from ..config import get_as_of_date
 from ..data.loader import load_all
 from ..data.repository import get_catalog
 from ..rules.pricing import format_brl
@@ -37,7 +37,7 @@ def _payment_label(code):
 
 
 def today() -> date:
-    return date.fromisoformat(os.getenv("AS_OF_DATE", "2026-03-31"))
+    return get_as_of_date()
 
 
 @lru_cache(maxsize=1)

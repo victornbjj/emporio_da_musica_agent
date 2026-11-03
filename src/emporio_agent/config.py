@@ -26,5 +26,9 @@ def get_settings() -> Settings:
         api_key=api_key,
         base_url=os.getenv("LLM_BASE_URL", "https://api.groq.com/openai/v1"),
         model=os.getenv("LLM_MODEL_NAME", "openai/gpt-oss-120b"),
-        as_of_date=date.fromisoformat(os.getenv("AS_OF_DATE", "2026-10-31")),
+        as_of_date=get_as_of_date(),
     )
+
+
+def get_as_of_date() -> date:
+    return date.fromisoformat(os.getenv("AS_OF_DATE", "2026-03-31"))

@@ -91,6 +91,20 @@ def test_dispatch_is_safe():
     assert dispatch("payment_options", '{"amount": 500}')["amount"] == "R$ 500,00"
 
 
+def test_dispatch_validates_arguments_and_calls_tools():
+    assert dispatch("search_products", '{"foo": 1}')["error"].startswith(
+        "invalid arguments"
+    )
+    assert (
+        dispatch(
+            "get_order_status",
+            '{"order_id": 12, "email": "patricia.cardoso@jmail.com"}',
+        )["verified"]
+        is True
+    )
+    assert dispatch("nao_existe", "{}")["error"].startswith("unknown tool")
+
+
 def test_every_schema_has_a_function():
     from emporio_agent.tools.registry import _FUNCTIONS
     assert {t["function"]["name"] for t in TOOL_SCHEMAS} == set(_FUNCTIONS)

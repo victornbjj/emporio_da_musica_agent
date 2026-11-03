@@ -1,4 +1,5 @@
 """Tool schemas shown to the LLM and a safe dispatcher."""
+import inspect
 import json
 
 from .checkout import calculate_shipping, payment_options
@@ -69,9 +70,13 @@ def dispatch(name: str, arguments: str | dict | None) -> dict:
             else dict(arguments or {})
     except (json.JSONDecodeError, TypeError, ValueError):
         return {"error": "arguments must be a valid JSON object"}
+    if not isinstance(args, dict):
+        return {"error": "arguments must be a valid JSON object"}
     try:
-        return func(**args)
+        inspect.signature(func).bind(**args)
     except TypeError as exc:                 # unknown/missing parameters invented by the model
         return {"error": f"invalid arguments: {exc}"}
+    try:
+        return func(**args)
     except Exception as exc:                 # keep the agent loop alive
         return {"error": f"tool failed: {type(exc).__name__}"}

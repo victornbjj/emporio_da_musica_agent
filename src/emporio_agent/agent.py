@@ -7,9 +7,8 @@ from datetime import date
 
 from openai import BadRequestError, RateLimitError
 
-from .config import get_settings
+from .config import get_as_of_date, get_settings
 from .prompts import build_system_prompt
-from .tools.orders import today as reference_date
 from .tools.registry import TOOL_SCHEMAS, dispatch
 
 MAX_TOOL_ROUNDS = 5       # tool-call rounds allowed per customer message
@@ -43,7 +42,7 @@ class Agent:
         self.model = model or get_settings().model
         self.sleep = sleep
         self.messages: list[dict] = [
-            {"role": "system", "content": build_system_prompt(today or reference_date())}
+            {"role": "system", "content": build_system_prompt(today or get_as_of_date())}
         ]
         self.trace: list[ToolTrace] = []     # tools used in the last turn (for the examples)
 
