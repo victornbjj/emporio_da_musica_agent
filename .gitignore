@@ -1,12 +1,9 @@
-n.idea/
 .env
-../.env
 .venv/
 __pycache__/
+*.pyc
 *.egg-info/
 .pytest_cache/
+.idea/
 sessions/
 .DS_Store
-__pycache__/
-*.pyc
-.idea/
