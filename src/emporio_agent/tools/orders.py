@@ -1,34 +1,31 @@
 """Order tools. Every order lookup requires identity verification."""
-import  os
+
+import os
 import re
-from dataclasses import  asdict
+from dataclasses import asdict
 from datetime import date
-from functools import  lru_cache
-
-
+from functools import lru_cache
 
 import pandas as pd
-
 
 from ..data.loader import load_all
 from ..data.repository import get_catalog
 from ..rules.pricing import format_brl
 from ..rules.returns import check_return_eligibility
 
-
 # Same answer for "order does not exist" and "data does not match" (no order enumeration).
 
 NOT_VERIFIED = {
-    "verified" : False,
+    "verified": False,
     "message": "Não encontrei um pedido com esses dados. Peça ao cliente para conferir "
-               "o número do pedido e o e-mail (ou os 4 últimos dígitos do telefone)."
+    "o número do pedido e o e-mail (ou os 4 últimos dígitos do telefone).",
 }
 
 IN_TRANSIT = {"pending", "confirmed", "shipped"}
-PAYMENTS_LABELS ={
-    "pix" : "PIX",
-    "boleto" : "boleto",
-    "debito": "cartão de débito"
+PAYMENTS_LABELS = {
+    "pix": "PIX",
+    "boleto": "boleto",
+    "debit": "cartão de débito",
 }
 
 
@@ -40,8 +37,7 @@ def _payment_label(code):
 
 
 def today() -> date:
-  return date.fromisoformat(os.getenv("AS_OF_DATE", "2026-03-31"))
-
+    return date.fromisoformat(os.getenv("AS_OF_DATE", "2026-03-31"))
 
 
 @lru_cache(maxsize=1)
@@ -53,14 +49,13 @@ def _digits(value) -> str:
     return re.sub(r"\D", "", str(value))
 
 
-
 def _verify(order_id, email, phone_last4):
     """Return (order, customer) only if the proof matches the order's OWN customer."""
     d = _data()
     try:
         oid = int(order_id)
     except (TypeError, ValueError):
-        return  None
+        return None
 
     rows = d["orders"][d["orders"].order_id == oid]
 
@@ -69,7 +64,6 @@ def _verify(order_id, email, phone_last4):
     order = rows.iloc[0]
 
     cust = d["customers"][d["customers"].customer_id == order.customer_id].iloc[0]
-
 
     ok = False
     if email:
@@ -80,33 +74,40 @@ def _verify(order_id, email, phone_last4):
     return (order, cust) if ok else None
 
 
-def get_order_status(order_id: int, email: str | None = None,
-                     phone_last4: str | None = None) -> dict:
-    verifield = _verify(order_id, email, phone_last4)
-    if verifield is None:
+def get_order_status(
+    order_id: int, email: str | None = None, phone_last4: str | None = None
+) -> dict:
+    verified = _verify(order_id, email, phone_last4)
+    if verified is None:
         return NOT_VERIFIED
-    order , _ = verifield
+    order, _ = verified
 
     d = _data()
-    names = names = {r["product_id"]: r["name"] for r in get_catalog().rows}
+    names = {r["product_id"]: r["name"] for r in get_catalog().rows}
     items = d["order_items"][d["order_items"].order_id == order.order_id]
     lines = [
-        {"product": names.get(int(i.product_id), f"produto {int(i.product_id)}"),
-         "quantity": int(i.quantity)}
+        {
+            "product": names.get(int(i.product_id), f"produto {int(i.product_id)}"),
+            "quantity": int(i.quantity),
+        }
         for i in items.itertuples()
     ]
 
-    estimated = order.estimated_delivery.date()
+    estimated = (
+        order.estimated_delivery.date() if pd.notna(order.estimated_delivery) else None
+    )
     out = {
         "verified": True,
         "order_id": int(order.order_id),
         "status": order.status,
         "order_date": str(order.order_date.date()),
-        "estimated_delivery": str(estimated),
+        "estimated_delivery": str(estimated) if estimated else None,
         "total_paid": format_brl(order.total_brl),
         "payment_method": _payment_label(order.payment_method),
         "items": lines,
-        "delayed": order.status in IN_TRANSIT and estimated < today(),
+        "delayed": bool(
+            estimated and order.status in IN_TRANSIT and estimated < today()
+        ),
     }
     if pd.notna(order.notes):
         out["notes"] = str(order.notes)
@@ -115,8 +116,9 @@ def get_order_status(order_id: int, email: str | None = None,
     return out
 
 
-def check_return(order_id: int, email: str | None = None,
-                 phone_last4: str | None = None) -> dict:
+def check_return(
+    order_id: int, email: str | None = None, phone_last4: str | None = None
+) -> dict:
     verified = _verify(order_id, email, phone_last4)
     if verified is None:
         return NOT_VERIFIED

@@ -2,7 +2,12 @@ import pytest
 
 from emporio_agent.data.loader import load_all
 from emporio_agent.tools.checkout import calculate_shipping, payment_options
-from emporio_agent.tools.orders import NOT_VERIFIED, check_return, get_order_status
+from emporio_agent.tools.orders import (
+    NOT_VERIFIED,
+    _payment_label,
+    check_return,
+    get_order_status,
+)
 from emporio_agent.tools.policies import search_policies
 from emporio_agent.tools.registry import TOOL_SCHEMAS, dispatch
 
@@ -98,3 +103,21 @@ def test_cancelled_order_exposes_reason_after_verification(data):
 def test_payment_method_is_human_readable(data):
     assert get_order_status(1, email=owner_email(data, 1))["payment_method"] == "PIX"
     assert get_order_status(2, email=owner_email(data, 2))["payment_method"] == "cartão de crédito em 6x"
+
+
+def test_order_without_estimated_delivery_does_not_crash():
+    r = get_order_status(12, email="patricia.cardoso@jmail.com")
+    assert r["verified"] and r["estimated_delivery"] is None and r["delayed"] is False
+
+
+def test_cancelled_order_exposes_reason():
+    r = get_order_status(17, email="matheus.correia@hayoo.com.br")
+    assert r["status"] == "cancelled" and "cancelado" in r["notes"]
+
+
+def test_other_customers_email_is_rejected():
+    assert get_order_status(5, email="anacarol.ferreira@coldmail.com")["verified"] is False
+
+
+def test_debit_label():
+    assert _payment_label("debit") == "cartão de débito"
