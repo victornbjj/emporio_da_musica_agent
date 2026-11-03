@@ -71,6 +71,7 @@ class Agent:
 
     # ---------- internals ----------
     def _finish(self, reply: str) -> str:
+        reply = reply.replace("\u2011", "-").replace("\u202f", " ").replace("\u00a0", " ")
         self.messages.append({"role": "assistant", "content": reply})
         return reply
 

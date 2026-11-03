@@ -62,6 +62,11 @@ def test_direct_answer_without_tools():
     assert roles(agent) == ["system", "user", "assistant"]
 
 
+def test_finish_normalizes_special_characters():
+    agent = make_agent(FakeClient([reply("e\u2011mail e R$\u202f1\u00a0000")]))
+    assert agent.chat("qual seu e-mail?") == "e-mail e R$ 1 000"
+
+
 def test_tool_call_round_trip():
     client = FakeClient([
         reply(tool_calls=[call("c1", "payment_options", {"amount": 500})]),
